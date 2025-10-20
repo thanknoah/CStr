@@ -34,10 +34,10 @@ void str_create(strObj* e) {
 	if (e->data == NULL) {
 		printf("CStr Error: memory allocation failed");
 		str_destroy_internal(e);
+		return;
 	}
 
 	e->data[0] = '\0';
-	
 }
 
 void str_modify(strObj* currentStr, const char* newStr) {
