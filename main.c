@@ -1,3 +1,5 @@
+// Around 2.5x quicker at modifying / appending && 8x quicker in highest time taken at modifying / appending compared to std::string
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
