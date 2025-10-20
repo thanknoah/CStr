@@ -29,7 +29,7 @@ void str_create(strObj* e) {
 	e->data = (char*)malloc(sizeof(char) * 15);
 	e->capacity = (size_t)(sizeof(char) * 15);
 	e->destroyed = false;
-	e->size = 0;
+	e->size = 15;
 
 	if (e->data == NULL) {
 		printf("CStr Error: memory allocation failed");
