@@ -2,61 +2,40 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct strObj strObj;
-
-struct strObj {
+typedef struct StrObj {
 	char* data;
 	size_t capacity;
 	size_t size;
-	bool destroyed;
 
-	void (*destroy)(strObj*);
-	void (*assign)(strObj*, const char*);
-	bool (*cmp)(strObj*, const char*);
-};
+	void (*destroy)(StrObj*);
+	void (*assign)(StrObj*, const char*);
+	void (*append)(StrObj*, const char*);
+	bool (*cmp)(StrObj*, const char*);
+} StrObj;
 
 
-void delete_string(strObj* currentStr) {
+void delete_string(StrObj* currentStr) {
 	free(currentStr->data);
 
-	currentStr->destroyed = true;
 	currentStr->capacity = 0;
 	currentStr->data = NULL;
 	currentStr->size = 0;
 }
 
-bool equal_string(strObj* currentStr, const char* newStr) {
-	if (currentStr->destroyed) {
-		printf("\nCStr Error: str is destroyed\n");
-		return false;
-	}
-
-	if (strcmp(currentStr->data, newStr) == 0)
-		return true;
-
-    return false;
+bool equal_string(StrObj* currentStr, const char* newStr) {
+	return strcmp(currentStr->data, newStr) == 0;
 }
 
-void modify_string(strObj* currentStr, const char* newStr) {
+void modify_string(StrObj* currentStr, const char* newStr) {
 	size_t newStrLen = strlen(newStr) + 1;
-	size_t predictedNewSize = (size_t)(currentStr->capacity * 2);
+	size_t predictedNewSize = currentStr->capacity * 2;
 	size_t newSize;
 
-	if (currentStr->destroyed) {
-		printf("\nCStr Error: str is destroyed\n");
-		return;
-	}
-
 	if (newStrLen > currentStr->capacity) {
-		if (predictedNewSize > newStrLen) {
-			newSize = predictedNewSize;
-		}
-		else {
-			newSize = newStrLen;
-		}
+		newSize = (predictedNewSize > newStrLen) ? predictedNewSize : newStrLen;
 
 		char* newMemoryBlock = (char*)malloc(newSize);
-		if (newMemoryBlock == NULL) {
+		if (!newMemoryBlock) {
 			printf("\nCStr Error: memory allocation failed\n");
 			return;
 		}
@@ -65,31 +44,53 @@ void modify_string(strObj* currentStr, const char* newStr) {
 
 		currentStr->data = newMemoryBlock;
 		currentStr->capacity = newSize;
-		currentStr->size = newStrLen - 1;
 	}
 
-	errno_t err = memcpy_s(currentStr->data, currentStr->capacity, newStr, newStrLen);
-	if (err != 0) {
-		printf("\nCStr Error: failed to copy new char to char ptr\n");
-		return;
+	memcpy(currentStr->data, newStr, newStrLen);
+	currentStr->size = newStrLen - 1;
+	currentStr->data[currentStr->size] = '\0';
+}
+
+void append_string(StrObj* currentStr, const char* newStr) {
+	size_t newStrLen = strlen(newStr);
+	size_t newTotalStrLen = currentStr->size + newStrLen + 1;
+	size_t predictedNewSize = currentStr->capacity * 2;
+	size_t newSize;
+
+	if (newTotalStrLen > currentStr->capacity) {
+		newSize = (predictedNewSize > newTotalStrLen) ? predictedNewSize : newTotalStrLen;
+
+		char* newMemoryBlock = (char*)malloc(newSize);
+		if (!newMemoryBlock) {
+			printf("\nCStr Error: memory allocation failed\n");
+			return;
+		}
+
+		memcpy(newMemoryBlock, currentStr->data, currentStr->size);
+		free(currentStr->data);
+
+		currentStr->data = newMemoryBlock;
+		currentStr->capacity = newSize;
 	}
+
+	memcpy(currentStr->data + currentStr->size, newStr, newStrLen);
+	currentStr->size += newStrLen;
+	currentStr->data[currentStr->size] = '\0';  // ensure null termination
 }
 
 
-strObj create_str(strObj* e) {
-	e->data = (char*)malloc(sizeof(char) * 15);
-	e->capacity = (size_t)(sizeof(char) * 15);
-	e->destroyed = false;
-	e->size = 15;
+StrObj create_str(StrObj* e) {
+	e->data = (char*)malloc(15);
+	e->capacity = 15;
+	e->size = 0;
 
 	e->destroy = delete_string;
+	e->append = append_string;
 	e->assign = modify_string;
 	e->cmp = equal_string;
 
-
-	if (e->data == NULL) {
+	if (!e->data) {
 		printf("\nCStr Error: memory allocation failed\n");
-		e->destroyed = true;
 		e->capacity = 0;
 		e->data = NULL;
 		e->size = 0;
@@ -101,35 +102,14 @@ strObj create_str(strObj* e) {
 }
 
 int main() {
-	// Create string objects
-	strObj name = create_str(&name);
-	strObj greeting = create_str(&greeting);
-	strObj secret = create_str(&secret);
+	StrObj e = create_str(&e);
 
-	// Assign initial values
-	name.assign(&name, "Alice");
-	greeting.assign(&greeting, "Hello");
-	secret.assign(&secret, "OpenSesame");
+	e.assign(&e, "Hello");
+	e.append(&e, " World");
+	printf(e.data); // Prints Hello World
+	e.cmp(&e, "Hello World"); // Returns true
+	e.destroy(&e);
 
-	// Getting values
-	printf(name.data); // Prints Alice
-	printf(greeting.data); // Prints Hello
-	printf(secret.data) // Prints OpenSesame
-
-	// Check if values equal to something
-	name.cmp(&name, "Alice"); // Results in true
-	greeting.cmp(&greeting, greeting.data) // Results in true, compares to itself
-    secret.cmp(&secret, name.data) // Results in false
-
-	// Modifying values
-	name.assign(&name, "ExampleNameThatIsReallyLong"); // Readjusts memory size by x2
-	greeting.assign(&greeting, "ExampleGreetingThatIsReallyLong");  // Readjusts memory size by x2
-	secret.assign(&secret, "ExampleSecretThatIsReallyLong");  // Readjusts memory size by x2
-
-	// Cleanup, doesnt auto clean up yet for C
-	name.destroy(&name);
-	greeting.destroy(&greeting);
-	secret.destroy(&secret);
 
 	return 0;
 }
