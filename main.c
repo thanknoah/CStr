@@ -51,14 +51,10 @@ void str_modify(strObj* currentStr, const char* newStr) {
 	}
 
 	if (newStrLen > currentStr->capacity) {
-		size_t newSize;
-
-		if (predictedNewSize > newStrLen) {
+		if (predictedNewSize > newStrLen)
 			newSize = predictedNewSize;
-		}
-		else {
+		else 
 			newSize = newStrLen;
-		}
 		
 		char* newMemoryBlock = (char*)malloc(newSize);
 		if (newMemoryBlock == NULL) {
