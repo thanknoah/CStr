@@ -100,10 +100,14 @@ StrObj create_str(StrObj* e) {
 }
 
 int main() {
-	StrObj e = create_str(&e);
+	StrObj mystring = create_str(&mystring); 
+	mystring.assign(&mystring, "Hello "); 
+	mystring.append(&mystring, "World"); 
 
-	e.append(&e, "hi");
-	printf(e.data);
+	mystring.cmp(&mystring, mystring.data); // comparing with itself Returns true
+	mystring.cmp(&mystring, "Bye World"); // Returns false
 
+	printf(mystring.data); 
+	mystring.destroy(&mystring);
 	return 0;
 }
