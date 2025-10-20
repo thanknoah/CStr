@@ -46,9 +46,7 @@ void modify_string(StrObj* currentStr, const char* newStr) {
 		currentStr->capacity = newSize;
 	}
 
-	memcpy(currentStr->data, newStr, newStrLen);
-	currentStr->size = newStrLen - 1;
-	currentStr->data[currentStr->size] = '\0';
+	memcpy(currentStr->data, newStr, newStrLen+1);
 }
 
 void append_string(StrObj* currentStr, const char* newStr) {
@@ -73,9 +71,7 @@ void append_string(StrObj* currentStr, const char* newStr) {
 		currentStr->capacity = newSize;
 	}
 
-	memcpy(currentStr->data + currentStr->size, newStr, newStrLen);
-	currentStr->size += newStrLen;
-	currentStr->data[currentStr->size] = '\0';  // ensure null termination
+	memcpy(currentStr->data + currentStr->size, newStr, newStrLen+1);
 }
 
 
@@ -104,21 +100,8 @@ StrObj create_str(StrObj* e) {
 int main() {
 	StrObj e = create_str(&e);
 
-	printf("%zu\n", e.size); // Empty string so prints 0
-	printf("%zu\n", e.capacity); // Empty string, prints 15 as is allocated by default
+	e.append(&e, "hi");
+	printf(e.data);
 
-	e.assign(&e, "Hello");
-	e.append(&e, " World");
-
-	printf("\n");
-	printf(e.data); // prints Hello World
-	printf("%zu\n", e.size); // prints whatever the size of Hello World is
-
-	e.cmp(&e, "Hello World"); // returns true
-	e.assign(&e, "Bye World"); // reassigns value to Bye World
-
-	printf("\n");
-	printf(e.data); // prints Bye World
-	e.destroy(&e); // Destorys Value
 	return 0;
 }
