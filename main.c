@@ -104,12 +104,21 @@ StrObj create_str(StrObj* e) {
 int main() {
 	StrObj e = create_str(&e);
 
+	printf("%zu\n", e.size); // Empty string so prints 0
+	printf("%zu\n", e.capacity); // Empty string, prints 15 as is allocated by default
+
 	e.assign(&e, "Hello");
 	e.append(&e, " World");
-	printf(e.data); // Prints Hello World
-	e.cmp(&e, "Hello World"); // Returns true
-	e.destroy(&e);
 
+	printf("\n");
+	printf(e.data); // prints Hello World
+	printf("%zu\n", e.size); // prints whatever the size of Hello World is
 
+	e.cmp(&e, "Hello World"); // returns true
+	e.assign(&e, "Bye World"); // reassigns value to Bye World
+
+	printf("\n");
+	printf(e.data); // prints Bye World
+	e.destroy(&e); // Destorys Value
 	return 0;
 }
