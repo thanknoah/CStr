@@ -198,9 +198,14 @@ StrObj init_str(StrObj* e) {
 
 int main() {
 	// Initiate Str Lib
+	StrLib strlib = init_str_lib(&strlib);
+	
+    /*
+    You can also do it this way
 	StrLib strlib;
 	init_str_lib(&strlib);
-
+	*/
+	
 	// Initate Strings
 	StrObj user = init_str(&user);
 	StrObj pass = init_str(&pass);
