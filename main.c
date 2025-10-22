@@ -243,6 +243,10 @@ int main() {
 	printf("\n");
 	printf(message.data);
 
+	// Change message and reprint it
+	strlib.assign(&message, "Thank you for visiting my program, bye!");
+    printf("\n");
+	printf(message.data);
 
 	// Additional Data
 	message.size; // length of str
