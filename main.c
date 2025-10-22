@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <iostream>
-#include <chrono>
-#include <vector>
 
 typedef struct StrObj {
 	char* data;
