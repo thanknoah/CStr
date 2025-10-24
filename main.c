@@ -236,7 +236,7 @@ int main() {
 		strlib.append(&message, " successfuly logged in!"); // Appending to string
 	}
 	else {
-		strlib.assign(&message, " successfuly NOT logged in!"); // Appending to string
+		strlib.append(&message, " successfuly NOT logged in!"); // Appending to string
 	}
 
 	// Print result
