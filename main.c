@@ -206,35 +206,33 @@ StrObj init_str(StrObj* e) {
 	return *e;
 }
 
-/*
-Example Usage:
-int main() {
-   StrLib strlib = init_str_lib(&strlib);
-   StrObj string1 = init_str(&string1);
-   StrObj string2 = init_str(&string2):
-   StrObj input = init_str(&input);
+// EXAMPLE PROGRAM
+void test() {
+	StrLib strlib = init_str_lib(&strlib);
+	StrObj string1 = init_str(&string1);
+	StrObj string2 = init_str(&string2);
+    StrObj input = init_str(&input);
 
-   strlib.assign(&string1, "My String");
-   strlib.assign(&string2, "My String");
-   strlib.cmp(&string1, &string2); // Returns true
+	strlib.assign(&string1, "My String");
+	strlib.assign(&string2, "My String");
+	strlib.cmp(string1.data, string2.data); // Returns true
 
-   strlib.append(&string1, " is the best!");
-   printf(string1.data) // Prints My String is the best!
-   printf(string2.data) // Prints My String
+	strlib.append(&string1, " is the best!");
+	printf(string1.data); // Prints My String is the best!
+	printf("\n");
+	printf(string2.data); // Prints My String
+	printf("\n");
 
-   strlib.move(&string1, &string2); // moves ownership from string 1 to string 2, string1 becomes valid
+	strlib.move(&string1, &string2); // moves ownership from string 1 to string 2, string1 becomes valid
 
-   strlib.get_input(&input, 200); // gets input, max 200 chars
-   if (strlib.cmp(input.data, "Test")) { // checks if input is equal to test
-      printf("\n Nice you guessed the password");
-   }
-	
-   // Make sure to destroy striings!
-   string1.destroy();
-   string2.destroy();
-   input.destroy();
-	
-   
+	printf("\n");
+	strlib.get_input(&input, 200); // gets input, max 200 chars
+	if (strlib.cmp(input.data, "Test")) { // checks if input is equal to test
+		printf("\nNice you guessed the password");
+	}
+
+	// Make sure to destroy striings!
+	strlib.destroy(&string1);
+	strlib.destroy(&string2);
+	strlib.destroy(&input);
 }
-
-/*
