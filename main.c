@@ -87,6 +87,7 @@ void move_ownership(StrObj* oldStr, StrObj* newStr) {
 		}
 	}
 
+	free(newStr->data);
 	newStr->data = oldStr->data;
 	newStr->size = oldStr->size;
 	oldStr->data = NULL;
@@ -204,3 +205,36 @@ StrObj init_str(StrObj* e) {
 	e->data[0] = '\0';
 	return *e;
 }
+
+/*
+Example Usage:
+int main() {
+   StrLib strlib = init_str_lib(&strlib);
+   StrObj string1 = init_str(&string1);
+   StrObj string2 = init_str(&string2):
+   StrObj input = init_str(&input);
+
+   strlib.assign(&string1, "My String");
+   strlib.assign(&string2, "My String");
+   strlib.cmp(&string1, &string2); // Returns true
+
+   strlib.append(&string1, " is the best!");
+   printf(string1.data) // Prints My String is the best!
+   printf(string2.data) // Prints My String
+
+   strlib.move(&string1, &string2); // moves ownership from string 1 to string 2, string1 becomes valid
+
+   strlib.get_input(&input, 200); // gets input, max 200 chars
+   if (strlib.cmp(input.data, "Test")) { // checks if input is equal to test
+      printf("\n Nice you guessed the password");
+   }
+	
+   // Make sure to destroy striings!
+   string1.destroy();
+   string2.destroy();
+   input.destroy();
+	
+   
+}
+
+/*
