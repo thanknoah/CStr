@@ -15,8 +15,31 @@ typedef struct StrLib {
 	void (*destroy)(StrObj*);
 	void (*assign)(StrObj*, const char*);
 	void (*append)(StrObj*, const char*);
+	void (*move)(StrObj*, StrObj*);
 	bool (*cmp)(const char*, const char*);
 } StrLib;
+
+bool alloc_custom_str_mem(StrObj* currentStr, size_t size) {
+	char* newMemoryBlock = (char*)malloc(size + 1);
+	if (!newMemoryBlock) {
+		printf("\nCStr Error: memory allocation failed\n");
+		return false;
+	}
+
+	free(currentStr->data);
+	currentStr->data = newMemoryBlock;
+	currentStr->capacity = size + 1;
+
+	return true;
+}
+
+void delete_string(StrObj* currentStr) {
+	free(currentStr->data);
+
+	currentStr->capacity = 0;
+	currentStr->data = NULL;
+	currentStr->size = 0;
+}
 
 
 size_t performance_growth(size_t currentCapacity) {
@@ -55,36 +78,27 @@ size_t memory_efficient_growth(size_t currentCapacity) {
 	return predicted;
 }
 
+void move_ownership(StrObj* oldStr, StrObj* newStr) {
+	if (newStr->capacity < oldStr->size + 1) {
+		bool allocateMemory = alloc_custom_str_mem(newStr, oldStr->size + 1);
+		if (!allocateMemory) {
+			printf("\nCStr Error: failed to transfer ownership of str");
+			return;
+		}
+	}
 
-void delete_string(StrObj* currentStr) {
-	free(currentStr->data);
-
-	currentStr->capacity = 0;
-	currentStr->data = NULL;
-	currentStr->size = 0;
+	newStr->data = oldStr->data;
+	newStr->size = oldStr->size;
+	oldStr->data = NULL;
+	delete_string(oldStr);
 }
 
 bool equal_string(const char* firstStr, const char* secondStr) {
 	return strcmp(firstStr, secondStr) == 0;
 }
 
-bool input_custom_str_mem(StrObj* currentStr, size_t size) {
-	char* newMemoryBlock = (char*)malloc(size + 1);
-	if (!newMemoryBlock) {
-		printf("\nCStr Error: memory allocation failed\n");
-		return false;
-	}
-
-	free(currentStr->data);
-	currentStr->data = newMemoryBlock;
-	currentStr->capacity = size + 1;
-
-	return true;
-}
-
-
 void recv_input(StrObj* currentStr, size_t charLength) {
-	bool allocatedMemory = input_custom_str_mem(currentStr, charLength);
+	bool allocatedMemory = alloc_custom_str_mem(currentStr, charLength);
 	if (!allocatedMemory) {
 		printf("\nCStr Error: failed to get input");
 		return;
@@ -119,16 +133,11 @@ void modify_string(StrObj* currentStr, const char* newStr) {
 			newSize = predictedNewSize;
 
 
-		char* newMemoryBlock = (char*)malloc(newSize);
-		if (!newMemoryBlock) {
-			printf("\nCStr Error: memory allocation failed\n");
+		bool allocatedMemory = alloc_custom_str_mem(currentStr, newStrLen);
+		if (!allocatedMemory) {
+			printf("\nCStr Error: failed to assign new value to StrObj");
 			return;
 		}
-
-		free(currentStr->data);
-
-		currentStr->data = newMemoryBlock;
-		currentStr->capacity = newSize;
 	}
 
 	memcpy(currentStr->data, newStr, newStrSize);
@@ -173,6 +182,7 @@ StrLib init_str_lib(StrLib* e) {
 	e->assign = modify_string;
 	e->cmp = equal_string;
 	e->get_input = recv_input;
+	e->move = move_ownership;
 
 	return *e;
 }
@@ -193,66 +203,4 @@ StrObj init_str(StrObj* e) {
 
 	e->data[0] = '\0';
 	return *e;
-}
-// EXAMPLE PROGRAM
-
-int main() {
-	// Initiate Str Lib
-	StrLib strlib = init_str_lib(&strlib);
-	
-    /*
-    You can also do it this way
-	StrLib strlib;
-	init_str_lib(&strlib);
-	*/
-	
-	// Initate Strings
-	StrObj user = init_str(&user);
-	StrObj pass = init_str(&pass);
-	StrObj message = init_str(&message);
-
-	/*
-	You can also do it this way
-	StrObj user;
-	StrObj pass;
-	StrObj message;
-
-	init_str(&user);
-	init_str(&pass);
-	init_str(&message);
-	*/
-
-	// Assigning str to value
-	strlib.assign(&message, "You have");
-
-	// Get Inputs
-	printf("User: ");
-	strlib.get_input(&user, 200);
-	printf("Password: ");
-	strlib.get_input(&pass, 200);
-
-	// Check if they match
-	if (strlib.cmp(user.data, "Noah") && strlib.cmp(pass.data, "MySecretPassword")) {
-		strlib.append(&message, " successfuly logged in!"); // Appending to string
-	}
-	else {
-		strlib.append(&message, " successfuly NOT logged in!"); // Appending to string
-	}
-
-	// Print result
-	printf("\n");
-	printf(message.data);
-
-	// Change message and reprint it
-	strlib.assign(&message, "Thank you for visiting my program, bye!");
-    printf("\n");
-	printf(message.data);
-
-	// Additional Data
-	message.size; // length of str
-	message.capacity; // size of memory block
-	message.memoryEfficency; // u can set this to true or false but recommended to be false for peformance
-
-
-	return 0;
 }
