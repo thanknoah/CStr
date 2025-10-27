@@ -79,17 +79,10 @@ size_t memory_efficient_growth(size_t currentCapacity) {
 }
 
 void move_ownership(StrObj* oldStr, StrObj* newStr) {
-	if (newStr->capacity < oldStr->size + 1) {
-		bool allocateMemory = alloc_custom_str_mem(newStr, oldStr->size + 1);
-		if (!allocateMemory) {
-			printf("\nCStr Error: failed to transfer ownership of str");
-			return;
-		}
-	}
-
 	free(newStr->data);
 	newStr->data = oldStr->data;
 	newStr->size = oldStr->size;
+	newstr->capacity = oldStr->capacity;
 	oldStr->data = NULL;
 	delete_string(oldStr);
 }
